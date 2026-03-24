@@ -6,12 +6,13 @@
 \alias{icecdr-package}
 \title{icecdr: Download Sea Ice Concentration Data from the NSIDC Climate Data Record}
 \description{
-Programmatic access to NSIDC's sea ice concentration CDR versions 4 and 5 via its ERDAPP server. Supports caching results and optional fixes for some inconsistencies of the raw files.
+Programmatic access to NSIDC's sea ice concentration CDR versions 4 and 5 \url{https://nsidc.org/data/g02135/versions/4} via its ERDAPP server and Sea Ice index \url{https://nsidc.org/data/g02135/versions/4}. Supports caching results and optional fixes for some inconsistencies of the raw files.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://github.com/eliocamp/icecdr}
+  \item \url{https://eliocamp.github.io/icecdr/}
   \item Report bugs at \url{https://github.com/eliocamp/icecdr/issues}
 }
 

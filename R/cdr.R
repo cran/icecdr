@@ -7,7 +7,7 @@ make_cdr <- function(definition) {
     version = 5,
     file = NULL,
     dir = tempdir(),
-    use_cache = FALSE
+    use_cache = TRUE
   ) {
     cdr(
       date_range = date_range,
@@ -208,7 +208,7 @@ cdr <- function(
   format = "nc",
   file = NULL,
   dir = tempdir(),
-  use_cache = FALSE
+  use_cache = TRUE
 ) {
   if (!(version %in% c(4, 5))) {
     cli::cli_abort("Invalid version. Available versions are 4 and 5.")
@@ -386,22 +386,7 @@ cdr <- function(
 
   cli::cli_inform("Downloading data.")
 
-  response <- httr2::request(url) |>
-    httr2::req_user_agent(icecdr_user_agent) |>
-    httr2::req_error(is_error = \(resp) FALSE) |>
-    httr2::req_progress(type = "down") |>
-    httr2::req_perform(path = destination)
-
-  if (httr2::resp_is_error(response)) {
-    info <- error_info(response)
-    if (file.exists(destination)) {
-      file.remove(destination)
-    }
-    cli::cli_abort(c(
-      "Failed to download. Got error {info$status_code} with message:",
-      info$message
-    ))
-  }
+  download_file(url, destination)
 
   writeLines(url, source_file)
 
