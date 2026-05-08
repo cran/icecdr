@@ -4,7 +4,7 @@ make_cdr <- function(definition) {
   function(
     date_range,
     variables = "aice",
-    version = 5,
+    version = 6,
     file = NULL,
     dir = tempdir(),
     use_cache = TRUE
@@ -85,6 +85,13 @@ cdr_variables_daily <- list(
     stdev = "cdr_seaice_conc_stdev",
     interpolation_spatial = "cdr_seaice_conc_interp_spatial_flag",
     interpolation_temporal = "cdr_seaice_conc_interp_temporal_flag"
+  ),
+  v6 = list(
+    aice = "cdr_seaice_conc",
+    qa = "cdr_seaice_conc_qa_flag",
+    stdev = "cdr_seaice_conc_stdev",
+    interpolation_spatial = "cdr_seaice_conc_interp_spatial_flag",
+    interpolation_temporal = "cdr_seaice_conc_interp_temporal_flag"
   )
 )
 
@@ -101,8 +108,16 @@ cdr_variables_monthly <- list(
     aice = "cdr_seaice_conc_monthly",
     stdev = "cdr_seaice_conc_monthly_stdev",
     qa = "cdr_seaice_conc_monthly_qa_flag"
+  ),
+
+  v6 = list(
+    aice = "cdr_seaice_conc_monthly",
+    stdev = "cdr_seaice_conc_monthly_stdev",
+    qa = "cdr_seaice_conc_monthly_qa_flag"
   )
 )
+
+supported_versions <- c(4, 5, 6)
 
 cdr_variables <- list(
   monthly = cdr_variables_monthly,
@@ -204,19 +219,21 @@ cdr <- function(
 
   ygrid_range = c(NA, NA),
   ygrid_stride = 1,
-  version = 5,
+  version = 6,
   format = "nc",
   file = NULL,
   dir = tempdir(),
   use_cache = TRUE
 ) {
-  if (!(version %in% c(4, 5))) {
-    cli::cli_abort("Invalid version. Available versions are 4 and 5.")
+  if (!(version %in% supported_versions)) {
+    cli::cli_abort(
+      "Invalid version. Available versions are {supported_versions}"
+    )
   }
 
   resolution <- resolution[1]
   resolutions <- c("monthly", "daily")
-  if (!checkmate::test_choice(resolution, resolutions)) {
+  if (!(resolution %in% resolutions)) {
     cli::cli_abort(
       "{.arg resolutions} needs to be one of {.val {resolutions}}, not {.val {resolution}}."
     )
@@ -235,7 +252,7 @@ cdr <- function(
 
   hemisphere <- hemisphere[1]
   hemispheres <- c("south", "north")
-  if (!checkmate::test_choice(hemisphere, hemispheres)) {
+  if (!(hemisphere %in% hemispheres)) {
     cli::cli_abort(
       "{.arg hemisphere} needs to be one of {.val {hemispheres}}, not {.val {hemisphere}}."
     )
@@ -463,6 +480,8 @@ nsidc_variables <- c(
   "temporal_interpolation_flag"
 )
 
+# Will change to
+erdap_server <- "https://coastwatch.pfeg.noaa.gov/"
 
 nsidc_url <- function(
   variables = "cdr_seaice_conc",
@@ -484,7 +503,7 @@ nsidc_url <- function(
   hemisphere <- c(south = "sh", north = "nh")[hemisphere]
 
   base <- glue::glue(
-    "https://polarwatch.noaa.gov/erddap/griddap/nsidcG02202v{version}{hemisphere}{resolution}.{format}"
+    "{erdap_server}/erddap/griddap/nsidcG02202v{version}{hemisphere}{resolution}.{format}"
   )
   date_range_str <- format(date_range, "%Y-%m-%dT00:00:00Z")
   time <- variable_definition(date_range_str, date_stride)
